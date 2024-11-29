@@ -63,7 +63,7 @@ class TaskManager:
         """Удаление задачи"""
         if task_id.isdigit():
             for index, task in enumerate(self.tasks):
-                if task.id == task_id:
+                if task.id == int(task_id):
                     self.tasks.pop(index)
                     print(f"Задача с id {task_id} успешно удалена")
                     self.save_tasks()
@@ -75,22 +75,27 @@ class TaskManager:
 
     def edit_task(self, task_id: str, **kwargs):
         """Редактирование задачи"""
-        if task_id.isdigit():
-            if is_valid_future_date(kwargs["due_date"]):
-                for task in self.tasks:
-                    if task.id == int(task_id):
-                        for key, value in kwargs.items():
-                            if hasattr(task, key) and value:
-                                setattr(task, key, value)
-                        self.save_tasks()
-                        print(f"Задача с id {task_id} успешно изменена")
-                        break
-                else:
-                    print(f"Задачи с указанным id нет")
-            else:
-                print(f"Введите корректную дату")
-        else:
+        if not task_id.isdigit():
             print(f"Переданный id не является целым числом")
+            return -1
+        try:
+            if kwargs["due_date"]:
+                if not is_valid_future_date(kwargs["due_date"]):
+                    print(f"Введите корректную дату")
+                    return -1
+        except KeyError:
+            pass
+
+        for task in self.tasks:
+            if task.id == int(task_id):
+                for key, value in kwargs.items():
+                    if hasattr(task, key) and value:
+                        setattr(task, key, value)
+                self.save_tasks()
+                print(f"Задача с id {task_id} успешно изменена")
+                break
+        else:
+            print(f"Задачи с указанным id нет")
 
     def search_tasks(self, keyword: str):
         """Поиск задачи по ключевому слову"""
