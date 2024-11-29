@@ -1,4 +1,4 @@
 # created by virtualenv automatically
 .venv
-tasks.json
+app/tasks.json
 .idea
